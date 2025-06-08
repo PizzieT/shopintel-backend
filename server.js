@@ -14,7 +14,7 @@ mongoose.connect(MONGODB_URI, {
   useUnifiedTopology: true,
 })
 .then(() => console.log('✅ MongoDB connected'))
-.catch(err => console.error('❌ MongoDB connection error:', err));
+.catch(err => console.error('❌ MongoDB connection error:', err.message));
 
 // Sample Store model
 const storeSchema = new mongoose.Schema({
@@ -30,7 +30,7 @@ app.get('/', (req, res) => {
   res.send('ShopIntel Backend is Live!');
 });
 
-// ✅ /stores route
+// /stores route
 app.get('/stores', async (req, res) => {
   try {
     const stores = await Store.find();
