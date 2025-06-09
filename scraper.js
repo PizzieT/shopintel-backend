@@ -21,7 +21,6 @@ async function scrapeFromStoreLeads() {
   const content = await page.content();
   const $ = cheerio.load(content);
 
-  // Adjust these selectors based on actual page structure
   const stores = [];
 
   $('.store-row').each((i, el) => {
@@ -46,8 +45,6 @@ async function scrapeFromStoreLeads() {
 async function runScraper() {
   await mongoose.connect(process.env.MONGODB_URI);
   await scrapeFromStoreLeads();
-
-  // TODO: Add scrapeFromMyIPMS(), scrapeFromBuiltWith(), etc.
   mongoose.connection.close();
 }
 
