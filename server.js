@@ -39,6 +39,25 @@ app.get('/stores', async (req, res) => {
     res.status(500).json({ message: 'Error fetching stores', error });
   }
 });
+// TEMP: Add a dummy store for testing
+const Store = require('./models/Store'); // Adjust if your model path differs
+
+Store.findOne({ domain: 'testshop.myshopify.com' })
+  .then(existing => {
+    if (!existing) {
+      return Store.create({
+        name: 'Test Store',
+        domain: 'testshop.myshopify.com',
+        platform: 'Shopify'
+      });
+    } else {
+      console.log('Dummy store already exists.');
+    }
+  })
+  .then(() => {
+    console.log('Dummy store inserted (or already present).');
+  })
+  .catch(err => console.error('Error inserting dummy store:', err));
 
 // Start server
 const PORT = process.env.PORT || 5000;
