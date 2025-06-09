@@ -8,7 +8,9 @@ require('dotenv').config();
 
 const Store = require('./models/Store');
 
-// StoreLeads Scraper
+// ───────────────────────────────
+// 🛒 StoreLeads Scraper
+// ───────────────────────────────
 async function scrapeFromStoreLeads() {
   console.log('🕵️ Scraping from StoreLeads...');
 
@@ -27,7 +29,6 @@ async function scrapeFromStoreLeads() {
 
     const content = await page.content();
     const $ = cheerio.load(content);
-
     const stores = [];
 
     $('.store-row').each((i, el) => {
@@ -55,7 +56,9 @@ async function scrapeFromStoreLeads() {
   }
 }
 
-// MyIP.ms Scraper
+// ───────────────────────────────
+// 🌍 MyIP.ms Scraper
+// ───────────────────────────────
 async function scrapeFromMyIP() {
   console.log('🌐 Scraping from MyIP.ms...');
 
@@ -64,7 +67,6 @@ async function scrapeFromMyIP() {
       'https://www.myip.ms/browse/sites/1/own/376377/shopify.com'
     );
     const $ = cheerio.load(data);
-
     const stores = [];
 
     $('table tbody tr').each((i, el) => {
@@ -91,7 +93,9 @@ async function scrapeFromMyIP() {
   }
 }
 
-// Run all scrapers
+// ───────────────────────────────
+// 🏁 Run All Scrapers
+// ───────────────────────────────
 async function runScraper() {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
