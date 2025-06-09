@@ -21,17 +21,6 @@ mongoose.connect(MONGODB_URI, {
 app.get('/', (req, res) => {
   res.send('ShopIntel Backend is Live!');
 });
-
-// /stores route
-app.get('/stores', async (req, res) => {
-  try {
-    const stores = await Store.find();
-    res.json(stores);
-  } catch (error) {
-    res.status(500).json({ message: 'Error fetching stores', error });
-  }
-});
-
 // TEMP: Add a dummy store for testing
 Store.findOne({ domain: 'testshop.myshopify.com' })
   .then(existing => {
@@ -50,6 +39,15 @@ Store.findOne({ domain: 'testshop.myshopify.com' })
   })
   .catch(err => console.error('Error inserting dummy store:', err));
 
+// /stores route
+app.get('/stores', async (req, res) => {
+  try {
+    const stores = await Store.find();
+    res.json(stores);
+  } catch (error) {
+    res.status(500).json({ message: 'Error fetching stores', error });
+  }
+});
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
