@@ -2,6 +2,7 @@ require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const Store = require('./models/Store'); // ✅ Use your external model file
 
 const app = express();
 app.use(cors());
@@ -15,15 +16,6 @@ mongoose.connect(MONGODB_URI, {
 })
 .then(() => console.log('✅ MongoDB connected'))
 .catch(err => console.error('❌ MongoDB connection error:', err.message));
-
-// Sample Store model
-const storeSchema = new mongoose.Schema({
-  name: String,
-  description: String,
-  category: String,
-});
-
-const Store = mongoose.model('Store', storeSchema);
 
 // Routes
 app.get('/', (req, res) => {
@@ -39,9 +31,8 @@ app.get('/stores', async (req, res) => {
     res.status(500).json({ message: 'Error fetching stores', error });
   }
 });
-// TEMP: Add a dummy store for testing
-const Store = require('./models/Store'); // Adjust if your model path differs
 
+// TEMP: Add a dummy store for testing
 Store.findOne({ domain: 'testshop.myshopify.com' })
   .then(existing => {
     if (!existing) {
@@ -62,5 +53,5 @@ Store.findOne({ domain: 'testshop.myshopify.com' })
 // Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-  console.log(`🚀 Server is running on port ${PORT}`);
+  console.log(🚀 Server is running on port ${PORT});
 });
