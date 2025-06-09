@@ -1,0 +1,27 @@
+name: Scheduled Scraper
+
+on:
+  schedule:
+    - cron: '0 */12 * * *'  # Every 12 hours
+  workflow_dispatch:        # Allows manual trigger
+
+jobs:
+  run-scraper:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run scraper
+        env:
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+        run: node scraper.js
