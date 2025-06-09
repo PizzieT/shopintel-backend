@@ -12,37 +12,47 @@ const Store = require('./models/Store');
 async function scrapeFromStoreLeads() {
   console.log('🕵️ Scraping from StoreLeads...');
 
-  const browser = await puppeteer.launch({ headless: true });
-  const page = await browser.newPage();
+  let browser;
 
-  await page.goto('https://storeleads.app/shopify-stores', {
-    waitUntil: 'domcontentloaded',
-  });
+  try {
+    browser = await puppeteer.launch({
+      headless: true,
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+    });
 
-  const content = await page.content();
-  const $ = cheerio.load(content);
+    const page = await browser.newPage();
+    await page.goto('https://storeleads.app/shopify-stores', {
+      waitUntil: 'domcontentloaded',
+    });
 
-  const stores = [];
+    const content = await page.content();
+    const $ = cheerio.load(content);
 
-  $('.store-row').each((i, el) => {
-    const name = $(el).find('.store-name').text().trim();
-    const domain = $(el).find('.store-link').text().trim();
-    const platform = 'Shopify';
+    const stores = [];
 
-    if (domain) {
-      stores.push({ name, domain, platform });
+    $('.store-row').each((i, el) => {
+      const name = $(el).find('.store-name').text().trim();
+      const domain = $(el).find('.store-link').text().trim();
+      const platform = 'Shopify';
+
+      if (domain) {
+        stores.push({ name, domain, platform });
+      }
+    });
+
+    for (const store of stores) {
+      const exists = await Store.findOne({ domain: store.domain });
+      if (!exists) {
+        await Store.create(store);
+      }
     }
-  });
 
-  for (const store of stores) {
-    const exists = await Store.findOne({ domain: store.domain });
-    if (!exists) {
-      await Store.create(store);
-    }
+    console.log(`✅ Added ${stores.length} stores from StoreLeads`);
+  } catch (error) {
+    console.error('❌ StoreLeads scraping failed:', error.message);
+  } finally {
+    if (browser) await browser.close();
   }
-
-  await browser.close();
-  console.log(`✅ Added ${stores.length} stores from StoreLeads`);
 }
 
 // MyIP.ms Scraper
@@ -83,10 +93,15 @@ async function scrapeFromMyIP() {
 
 // Run all scrapers
 async function runScraper() {
-  await mongoose.connect(process.env.MONGODB_URI);
-  await scrapeFromStoreLeads();
-  await scrapeFromMyIP(); // include MyIP scraper
-  mongoose.connection.close();
+  try {
+    await mongoose.connect(process.env.MONGODB_URI);
+    await scrapeFromStoreLeads();
+    await scrapeFromMyIP();
+  } catch (err) {
+    console.error('❌ Error during scraping:', err.message);
+  } finally {
+    mongoose.connection.close();
+  }
 }
 
 if (require.main === module) {
