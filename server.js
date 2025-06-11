@@ -1,7 +1,7 @@
 const express = require('express');
 const mongoose = require('mongoose');
-const storeRoutes = require('./routes/store'); // Correct path to your router
-require('dotenv').config(); // Loads environment variables from .env
+const storeRoutes = require('./routes/store');
+require('dotenv').config();
 
 const app = express();
 
@@ -12,9 +12,11 @@ app.use(express.json());
 app.use('/api/stores', storeRoutes);
 
 // MongoDB connection
-const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/storesDB';
+if (!process.env.MONGO_URI) {
+  throw new Error('MONGO_URI is not defined in environment variables.');
+}
 
-mongoose.connect(mongoURI, {
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
