@@ -1,38 +1,28 @@
 const express = require('express');
-const router = express.Router();
-const Store = require('./models/Store');
+const mongoose = require('mongoose');
+const storeRoutes = require('./storeRoutes'); // Adjust if your router file is named differently
+require('dotenv').config(); // If you're using a .env file
 
-// GET: All stores (supports filters via query)
-router.get('/', async (req, res) => {
-  try {
-    const filters = {};
+const app = express();
 
-    if (req.query.country) filters.country = req.query.country;
-    if (req.query.platform) filters.platform = req.query.platform;
-    if (req.query.niche) filters.niche = req.query.niche;
-    if (req.query.minSales) filters.estimatedSales = { $gte: Number(req.query.minSales) };
-    if (req.query.launchAfter) filters.launchDate = { $gte: new Date(req.query.launchAfter) };
+// Middleware
+app.use(express.json());
 
-    const stores = await Store.find(filters).sort({ launchDate: -1 });
-    res.json(stores);
-  } catch (error) {
-    res.status(500).json({ message: 'Failed to get stores', error });
-  }
+// Routes
+app.use('/api/stores', storeRoutes);
+
+// MongoDB Connection (Optional: Add your MongoDB URI here)
+mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/storesDB', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+}).then(() => {
+  console.log('MongoDB connected');
+}).catch((err) => {
+  console.error('MongoDB connection error:', err);
 });
 
-// POST: Add new store
-router.post('/', async (req, res) => {
-  try {
-    const store = await Store.create(req.body);
-    res.status(201).json(store);
-  } catch (error) {
-    res.status(400).json({ message: 'Failed to create store', error });
-  }
-});
-
+// Start server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
-
-module.exports = router;
