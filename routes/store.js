@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Store = require('./models/Store');
+const Store = require('../models/Store');
 
 // GET: All stores (supports filters via query)
 router.get('/', async (req, res) => {
